@@ -1,0 +1,82 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>JSON Editor</title>
+
+  <link href="./dist/jsoneditor.min.css" rel="stylesheet" type="text/css">
+  <script src="./dist/jsoneditor.min.js"></script>
+    
+  <script src="./dist/filereader.js"></script>
+  <script src="./dist/FileSaver.js"></script>
+
+    <style type="text/css">
+    body {
+      font-family: sans-serif;
+    }
+
+    #jsoneditor1
+    {
+      position:absolute;
+            top: 60px;
+            left: 10px;
+            width: 500px;
+            height: 500px;
+    }
+    #jsoneditor2
+    {
+      position:absolute;
+            top: 60px;
+            left: 526px;
+            width: 500px;
+            height: 500px;
+        }
+  </style>
+</head>
+<body>
+<p>
+    <input id="loadDocument" type="file" style="display:none;" />
+    <input type="button" value="Load FNT.json" onclick="document.getElementById('loadDocument').click();" />
+    <input type="button" id="saveDocument" value="Save FNT.json" />
+</p>
+
+<div id="jsoneditor1"></div>
+<div id="jsoneditor2"></div>
+
+<script>
+    // create editor 1
+    var editor1 = new JSONEditor(document.getElementById('jsoneditor1'), {
+        mode:'code',
+        onChangeText: function () {
+            editor2.setText(editor1.getText());
+        }
+    });
+
+    // create editor 2
+    var editor2 = new JSONEditor(document.getElementById('jsoneditor2'), {
+        mode:'tree',
+        onChangeText: function () {
+            editor1.setText(editor2.getText()),
+            editor1.format();
+        }
+    });
+
+    // Load a JSON document
+    FileReaderJS.setupInput(document.getElementById('loadDocument'), {
+        readAsDefault: 'Text',
+        on: {
+            load: function (event, file) {
+                editor1.setText(event.target.result),
+                editor2.setText(event.target.result);
+            }
+        }
+    });
+
+    // Save a JSON document
+    document.getElementById('saveDocument').onclick = function () {
+        var blob = new Blob([editor1.getText()], { type: 'application/json;charset=utf-8' });
+        saveAs(blob, 'fnt.json');
+    };
+</script>
+</body>
+</html>
